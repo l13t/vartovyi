@@ -28,12 +28,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7.0.1
-      - uses: hashicorp/setup-nomad@v1.0.0
-        with:
-          version: '2.1.1'
-      - uses: hashicorp/setup-nomad-pack@0.10.0
-        with:
-          version: '0.4.2'
+      - name: Install verified Nomad CLIs
+        env:
+          NOMAD_VERSION: '2.1.1'
+          NOMAD_PACK_VERSION: '0.4.2'
+        run: |
+          tool_dir="$RUNNER_TEMP/vartovyi-tools"
+          mkdir -p "$tool_dir"
+          cd "$tool_dir"
+          for product in nomad nomad-pack; do
+            case "$product" in
+              nomad) version="$NOMAD_VERSION" ;;
+              nomad-pack) version="$NOMAD_PACK_VERSION" ;;
+            esac
+            archive="${product}_${version}_linux_amd64.zip"
+            checksums="${product}_${version}_SHA256SUMS"
+            base="https://releases.hashicorp.com/$product/$version"
+            curl --fail --silent --show-error --location --retry 3 --max-time 60 "$base/$archive" -o "$archive"
+            curl --fail --silent --show-error --location --retry 3 --max-time 60 "$base/$checksums" -o "$checksums"
+            awk -v archive="$archive" '$2 == archive { print }' "$checksums" | sha256sum --check --status
+            unzip -p "$archive" "$product" > "$product"
+            chmod +x "$product"
+          done
+          echo "$tool_dir" >> "$GITHUB_PATH"
       - run: python3 scripts/check-pack.py
   integration:
     runs-on: ubuntu-latest
@@ -46,7 +63,7 @@ jobs:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-node@v7.1.0
         with:
-          node-version: '26.13.0'
+          node-version-file: '.node-version'
           cache: npm
       - run: npm ci
       - run: npm test
@@ -64,7 +81,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v7.1.0
         with:
-          node-version: '26.13.0'
+          node-version-file: '.node-version'
           cache: npm
       - run: npm ci
       - run: npm test

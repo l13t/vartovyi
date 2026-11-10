@@ -54,3 +54,18 @@ test('configured commit rules select patch, minor, major or no release', async (
     }), expected, message);
   }
 });
+
+test('configured preset renders initial release notes with the installed writer', async () => {
+  const { generateNotes } = await import('@semantic-release/release-notes-generator');
+  const config = require('../.releaserc.json');
+  const options = config.plugins.find(p => p[0] === '@semantic-release/release-notes-generator')[1];
+  const notes = await generateNotes(options, {
+    cwd: process.cwd(), options: { repositoryUrl: config.repositoryUrl },
+    lastRelease: { version: '0.0.0', gitTag: 'v0.0.0' },
+    nextRelease: { version: '0.1.0', gitTag: 'v0.1.0' },
+    commits: [{ hash: 'a'.repeat(40), message: 'feat: initial implementation' }],
+    logger: { log() {} },
+  });
+  assert.match(notes, /0\.1\.0/);
+  assert.match(notes, /initial implementation/);
+});

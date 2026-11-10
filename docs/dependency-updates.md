@@ -22,11 +22,17 @@ upstream GitHub releases. Go module versions and checksums are in `go.mod` and
 | oauth2 | 0.25.0 | 0.38.0 |
 | OpenTelemetry | newly added | 1.47.0 |
 | semantic-release | 25.0.2 | 25.0.9 |
-| Conventional Commits preset | 9.0.0 | 10.4.1 |
+| Conventional Commits preset | 9.0.0 | 9.3.1 |
 | Release Node.js | 24.10.0 | 26.13.0 |
 
-GitHub Actions are pinned to current release tags in `.github/workflows/ci.yml`;
-the previous floating `hashicorp/setup-nomad-pack@main` is pinned to `0.10.0`.
+GitHub Actions are pinned to release tags in `.github/workflows/ci.yml`.
+Nomad CLIs are installed from versioned official archives with SHA-256 checks,
+avoiding the Node 20 runtimes declared by the HashiCorp setup actions. Release
+Node.js is shared through `.node-version`.
+
+Conventional Commits preset 10.x requires changelog writer 9+, while the installed
+release-notes-generator 14.1.1 uses writer 8. Preset 9.3.1 is pinned for
+compatibility; tests exercise both commit analysis and actual notes generation.
 MediaMTX 1.21.3 and Nomad Pack CLI 0.4.2 were already current and remain pinned.
 Go transitive dependencies were also updated to their current compatible releases.
 
