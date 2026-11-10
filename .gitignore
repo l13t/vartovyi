@@ -1,0 +1,13 @@
+/bin/
+/data/
+/tmp/
+/.env
+*.local.hcl
+*.local.json
+internal/web/static/vendor/*.js
+!internal/web/static/vendor/README.md
+coverage.out
+
+__pycache__/
+*.pyc
+node_modules/

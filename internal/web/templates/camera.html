@@ -1,0 +1,35 @@
+{{define "camera-tabs"}}<nav class="tabs" aria-label="{{tr $.Language "Розділи камери"}}"><a href="/cameras/{{.Camera.ID}}" {{if or (eq .CameraTab "camera") (not .CameraTab)}}aria-current="page"{{end}}>{{tr $.Language "Перегляд і архів"}}</a>{{if .CanManage}}<a href="/cameras/{{.Camera.ID}}/settings" {{if eq .CameraTab "camera-settings"}}aria-current="page"{{end}}>{{tr $.Language "Налаштування камери"}}</a><a href="/cameras/{{.Camera.ID}}/motion" {{if eq .CameraTab "camera-motion"}}aria-current="page"{{end}}>{{tr $.Language "Виявлення руху"}}</a>{{end}}</nav>{{end}}
+{{define "camera"}}{{template "head" .}}
+<a class="back-link" href="/">{{tr $.Language "← Камери"}}</a><p class="eyebrow">{{tr $.Language "СПОСТЕРЕЖЕННЯ"}}</p><h1>{{.Camera.Name}}</h1>{{template "camera-tabs" .}}
+<div class="video detail"><video id="player" data-live="/media/{{.Camera.ID}}/live/index.m3u8" muted autoplay playsinline controls></video></div>
+<p><span class="status" data-status="{{.Camera.ID}}">{{tr $.Language "Підключення…"}}</span> <button id="go-live">{{tr $.Language "Наживо"}}</button></p>
+<section id="archive" data-camera="{{.Camera.ID}}"><h2>{{tr $.Language "Архів"}}</h2><div class="fields"><label>{{tr $.Language "Від"}}<input id="archive-start" type="datetime-local"></label><label>{{tr $.Language "До"}}<input id="archive-end" type="datetime-local"></label></div><button id="load-timeline">{{tr $.Language "Показати записи"}}</button><div id="timeline" aria-label="{{tr $.Language "Інтервали запису"}}"></div><p id="archive-message" role="status"></p>{{if .CanManage}}<button id="export-video">{{tr $.Language "Експортувати MP4"}}</button><p id="export-message" role="status"></p>{{end}}</section>
+{{template "foot" .}}{{end}}
+
+{{define "camera-settings"}}{{template "head" .}}
+<a class="back-link" href="/">{{tr $.Language "← Камери"}}</a><p class="eyebrow">{{tr $.Language "ПАРАМЕТРИ КАМЕРИ"}}</p><h1>{{.Camera.Name}}</h1>{{template "camera-tabs" .}}
+<p><span class="status" data-status="{{.Camera.ID}}">{{tr .Language "Підключення…"}}</span></p><section><h2>{{tr $.Language "Підключення й запис"}}</h2>{{template "cameraform" .}}</section>
+{{template "foot" .}}{{end}}
+
+{{define "camera-motion"}}{{template "head" .}}
+<a class="back-link" href="/">{{tr $.Language "← Камери"}}</a><p class="eyebrow">{{tr $.Language "ПАРАМЕТРИ КАМЕРИ"}}</p><h1>{{.Camera.Name}}</h1>{{template "camera-tabs" .}}
+<div id="zones-editor" data-camera="{{.Camera.ID}}" data-revision="{{.Camera.Revision}}" class="page-columns">
+<section><h2>{{tr $.Language "Зони руху"}}</h2><div class="video motion-preview"><video id="player" data-live="/media/{{.Camera.ID}}/live/index.m3u8" muted autoplay playsinline></video><canvas id="zones-canvas" aria-label="{{tr .Language "Зони на відео"}}"></canvas></div>
+<p class="muted">{{tr .Language "Зелені зони виявляють рух, червоні виключають ділянки. Натисни зону у списку, щоб виділити її."}}</p>
+<h3>{{tr .Language "Налаштовані зони"}}</h3><div id="zone-list">{{range $i,$zone:=.Camera.Zones}}<div class="zone-row"><div><strong>{{$zone.Name}}</strong><span class="muted">{{if $zone.Exclude}}{{tr $.Language "Маска виключення"}}{{else}}{{tr $.Language "Зона виявлення"}}{{end}}</span></div><button type="button" data-zone-edit="{{$i}}">{{tr $.Language "Редагувати"}}</button><button type="button" data-zone-delete="{{$i}}">{{tr $.Language "Видалити"}}</button></div>{{else}}<p class="muted">{{tr .Language "Зон немає — рух виявляється по всьому кадру."}}</p>{{end}}</div>
+<button type="button" id="new-zone">{{tr .Language "Додати зону"}}</button><button type="button" id="clear-zones">{{tr .Language "Очистити зони"}}</button>
+</section><section><h2>{{tr .Language "Параметри руху"}}</h2>
+<label class="check"><input type="checkbox" id="motion-enabled" {{if .Camera.MotionDetectionEnabled}}checked{{end}}>{{tr .Language "Увімкнути виявлення руху"}}</label>
+<label>{{tr .Language "Область перевірки"}}<select id="motion-scope"><option value="full" {{if .Camera.UsesFullFrame}}selected{{end}}>{{tr .Language "Увесь кадр"}}</option><option value="zones" {{if not .Camera.UsesFullFrame}}selected{{end}}>{{tr .Language "Намальовані зони"}}</option></select></label>
+<p id="motion-scope-note" class="muted" role="status"></p>
+<p class="muted">{{tr .Language "Вимкнення детектора не зупиняє відеозапис. У режимі запису за рухом потік зберігається повністю, поки детектор вимкнений."}}</p>
+
+<label>{{tr .Language "Поріг руху (0–1)"}}<input id="motion-threshold" type="number" min="0.001" max="1" step="0.001" value="{{.Camera.Threshold}}" required></label>
+<div class="fields"><label>{{tr .Language "До події, секунд"}}<input id="motion-pre" type="number" min="0" max="120" value="{{.Camera.PreSeconds}}" required></label><label>{{tr .Language "Після події, секунд"}}<input id="motion-post" type="number" min="1" max="120" value="{{.Camera.PostSeconds}}" required></label></div>
+<h3 id="zone-form-title">{{tr .Language "Нова зона"}}</h3><label>{{tr .Language "Назва зони"}}<input id="zone-name" maxlength="100" value="{{tr .Language "Зона 1"}}"></label>
+<label class="check"><input type="checkbox" id="zone-exclude">{{tr .Language "Маска виключення"}}</label>
+<p class="muted">{{tr .Language "Увімкни малювання та натискай на відео, щоб додати вершини полігона. Додай полігон і збережи зони."}}</p>
+<button type="button" id="draw-zone">{{tr .Language "Намалювати заново"}}</button><button type="button" id="add-zone">{{tr .Language "Застосувати зону"}}</button><button type="button" id="cancel-zone">{{tr .Language "Скасувати редагування"}}</button>
+<details class="advanced"><summary>{{tr .Language "Координати зон"}}</summary><textarea id="zones-json" rows="5" aria-label="{{tr .Language "Зони JSON"}}">{{.Zones}}</textarea><button type="button" id="apply-zones-json">{{tr .Language "Застосувати координати"}}</button></details>
+<button type="button" id="save-zones" class="primary">{{tr .Language "Зберегти налаштування руху"}}</button><p id="zones-message" role="status" aria-live="polite"></p>
+</section></div>{{template "foot" .}}{{end}}

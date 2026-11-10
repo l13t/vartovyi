@@ -1,0 +1,11 @@
+{{define "dashboard"}}{{template "head" .}}
+<div class="heading"><div><p class="eyebrow">{{tr $.Language "ОГЛЯД СИСТЕМИ"}}</p><h1>{{tr $.Language "Твої камери"}}</h1></div>
+{{if .CanManage}}<a class="button primary" href="/cameras/new">{{tr $.Language "Додати камеру"}}</a>{{end}}</div>
+<form class="filter-bar" action="/" method="get">{{if .Pagination}}<input type="hidden" name="page_size" value="{{.Pagination.Size}}">{{end}}<label>{{tr .Language "Група камер"}}<select name="group"><option value="">default · {{tr .Language "Усі камери"}}</option><option value="-" {{if eq .GroupFilter "-"}}selected{{end}}>{{tr .Language "Лише default"}}</option>{{range .Groups}}<option value="{{.ID}}" {{if eq .ID $.GroupFilter}}selected{{end}}>{{.Name}}</option>{{end}}</select></label><button>{{tr .Language "Показати"}}</button>{{if .IsAdmin}}<a class="button" href="/settings?tab=camera-groups">{{tr .Language "Керувати групами"}}</a>{{end}}</form>
+<div class="grid">{{range .Cameras}}<article class="camera">
+<div class="video"><video data-live="/media/{{.ID}}/live/index.m3u8" muted autoplay playsinline controls></video></div>
+<a class="camera-title" href="/cameras/{{.ID}}"><h2>{{.Name}}</h2><span aria-hidden="true">↗</span></a>
+{{if .GroupID}}<span class="muted">{{index $.GroupNames .GroupID}}</span>{{end}}<div class="camera-meta"><span class="status" data-status="{{.ID}}">{{tr $.Language "Підключення…"}}</span><span class="muted">{{if eq .Mode "continuous"}}{{tr $.Language "Безперервний запис"}}{{else}}{{tr $.Language "Запис за рухом"}}{{end}}</span></div>
+</article>{{else}}<section class="empty"><h2>{{tr $.Language "Поки що немає камер"}}</h2><p>{{tr $.Language "Додай камеру, щоб почати перегляд і запис."}}</p>{{if .CanManage}}<a class="button primary" href="/cameras/new">{{tr $.Language "Додати першу камеру"}}</a>{{end}}</section>{{end}}</div>
+{{template "pagination" .}}
+{{template "foot" .}}{{end}}

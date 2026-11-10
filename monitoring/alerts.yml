@@ -1,0 +1,45 @@
+groups:
+  - name: vartovyi
+    rules:
+      - alert: VartovyiRecorderDown
+        expr: up{job="vartovyi-recorder"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Vartovyi recorder is unavailable
+      - alert: VartovyiArchiveFull
+        expr: vartovyi_disk_full == 1
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: Recording paused because the archive is full
+      - alert: VartovyiRecordingStale
+        expr: time() - vartovyi_last_segment_seconds > 60
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Camera has not finalized a recording segment
+      - alert: VartovyiDetectorStale
+        expr: time() - vartovyi_detector_heartbeat_seconds > 15
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: Motion detector is unavailable; recording may be in fail-open mode
+      - alert: VartovyiOutboxBacklog
+        expr: vartovyi_outbox_pending > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Event publication is falling behind
+      - alert: VartovyiNotificationFailure
+        expr: vartovyi_notifications_failed > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: Telegram notifications repeatedly failed

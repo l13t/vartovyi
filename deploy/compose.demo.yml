@@ -1,0 +1,39 @@
+# Add to compose.test.yml for a persistent synthetic video source.
+services:
+  demo:
+    build:
+      context: ..
+      target: runtime
+    entrypoint: [/usr/bin/ffmpeg]
+    command:
+      - -nostdin
+      - -hide_banner
+      - -loglevel
+      - warning
+      - -re
+      - -f
+      - lavfi
+      - -i
+      - testsrc2=size=960x540:rate=10
+      - -an
+      - -c:v
+      - libx264
+      - -threads
+      - '2'
+      - -preset
+      - ultrafast
+      - -tune
+      - zerolatency
+      - -crf
+      - '28'
+      - -g
+      - '20'
+      - -f
+      - rtsp
+      - -rtsp_transport
+      - tcp
+      - rtsp://source:8554/synthetic
+    depends_on: [source]
+    restart: unless-stopped
+    cpus: 0.5
+    mem_limit: 128m

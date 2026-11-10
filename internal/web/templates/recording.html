@@ -1,0 +1,31 @@
+{{define "recording-messages"}}
+{{if .RecordingSaved}}<p class="notice success" role="status">{{tr .Language "Налаштування зберігання збережено."}}</p>{{end}}{{if .RecordingError}}<p class="notice error" role="alert">{{.RecordingError}}</p>{{end}}
+{{end}}
+{{define "recording-settings"}}
+{{template "recording-messages" .}}
+{{if .RecordingEditing}}
+<a class="back-link" href="/settings?tab=recording">{{tr .Language "← Усі квоти"}}</a>
+<section class="quota-editor"><p class="eyebrow">{{tr .Language "Редагування квот"}}</p><h2>{{.RecordingScopeName}}</h2>
+<form action="/ui/settings/recording" method="post"><input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="revision" value="{{.Recording.Revision}}"><input type="hidden" name="camera_revision" value="{{.CameraRevision}}"><input type="hidden" name="scope" value="{{.RecordingScope}}">
+<label>{{tr .Language "Максимальна давність, днів"}}<input type="number" name="max_age_days" min="0" max="3650" value="{{.RecordingLimits.MaxAgeDays}}" required></label>
+<label>{{tr .Language "Максимальна кількість відеофайлів"}}<input type="number" name="max_segments" min="0" max="100000000" value="{{.RecordingLimits.MaxSegments}}" required></label>
+<label>{{tr .Language "Максимальний розмір відео, ГіБ"}}<input type="number" name="max_gib" min="0" max="1048576" step="any" value="{{.RecordingGiB}}" required></label>
+<p class="muted">{{tr .Language "0 означає без ліміту на цьому рівні. Ліміти камери, групи та всіх камер діють одночасно."}}</p>
+<p class="muted">{{tr .Language "Для групи та всіх камер кількість і розмір рахуються сумарно. Лічиться кожен завершений відеофайл архіву, а не подія руху."}}</p>
+<p class="muted">{{tr .Language "Після збереження зайві найстаріші відеофайли видалятимуться у фоні. Активний запис і буфер навколо події захищені; через це ліміт може тимчасово перевищуватися."}}</p>
+<button class="primary">{{tr .Language "Зберегти ліміти"}}</button><a class="button" href="/settings?tab=recording">{{tr .Language "Скасувати"}}</a></form>
+
+</section>
+{{else}}
+<section><div class="heading"><h2>{{tr .Language "Квоти архіву"}}</h2><a class="button" href="/settings?tab=camera-groups">{{tr .Language "Керувати групами"}}</a></div>
+<p class="muted">{{tr .Language "Натисни назву або значення квоти, щоб змінити ліміти."}}</p>
+{{if .RecordingScopeMissing}}<p class="notice error" role="alert">{{tr .Language "Камеру або групу не знайдено. Вибери квоту зі списку."}}</p>{{end}}
+<div class="table-wrap"><table class="quota-table"><thead><tr><th>{{tr .Language "Застосувати до"}}</th><th>{{tr .Language "Давність, днів"}}</th><th>{{tr .Language "Відеофайлів"}}</th><th>{{tr .Language "Розмір, ГіБ"}}</th></tr></thead><tbody>
+{{range .RecordingScopes}}<tr><th scope="row"><a href="/settings?tab=recording&amp;scope={{.Value}}">{{.Name}}</a></th>
+<td><a href="/settings?tab=recording&amp;scope={{.Value}}">{{if .Limits.MaxAgeDays}}{{.Limits.MaxAgeDays}}{{else}}{{tr $.Language "Без ліміту"}}{{end}}</a></td>
+<td><a href="/settings?tab=recording&amp;scope={{.Value}}">{{if .Limits.MaxSegments}}{{.Limits.MaxSegments}}{{else}}{{tr $.Language "Без ліміту"}}{{end}}</a></td>
+<td><a href="/settings?tab=recording&amp;scope={{.Value}}">{{if .Limits.MaxBytes}}{{.GiB}}{{else}}{{tr $.Language "Без ліміту"}}{{end}}</a></td></tr>{{end}}
+</tbody></table></div>
+<p class="muted">{{tr .Language "0 означає без ліміту на цьому рівні. Ліміти камери, групи та всіх камер діють одночасно."}}</p></section>
+{{end}}
+{{end}}

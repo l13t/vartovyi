@@ -1,0 +1,59 @@
+{{define "new-camera"}}{{template "head" .}}
+<a class="back-link" href="/">{{tr $.Language "← Камери"}}</a><p class="eyebrow">{{tr $.Language "ПІДКЛЮЧЕННЯ"}}</p><h1>{{tr $.Language "Додати камеру"}}</h1>
+<p><a class="text-link" href="/cameras/new">{{tr .Language "Відкрити візард →"}}</a></p>
+<div class="page-columns"><section><h2>{{tr $.Language "Параметри підключення"}}</h2>{{template "cameraform" .}}</section>
+<aside><section><h2>{{tr $.Language "Знайти камеру в мережі"}}</h2><p class="muted">{{tr $.Language "ONVIF допоможе знайти сумісні камери та отримати їхні відеопрофілі."}}</p><a class="button" href="/tools/onvif">{{tr $.Language "Відкрити ONVIF →"}}</a></section></aside></div>
+{{template "foot" .}}{{end}}
+
+{{define "onvif"}}{{template "head" .}}
+<a class="back-link" href="/cameras/new">{{tr $.Language "← Додати камеру"}}</a><p class="eyebrow">{{tr $.Language "ІНСТРУМЕНТИ КАМЕР"}}</p><h1>ONVIF</h1>
+<div class="page-columns"><section><h2>{{tr $.Language "Пошук у мережі"}}</h2><p class="muted">{{tr $.Language "Автоматичний пошук працює в локальному сегменті мережі. Також можна ввести адресу камери вручну."}}</p><button id="discover">{{tr $.Language "Знайти камери"}}</button><pre id="discovery-result" role="status"></pre></section>
+<section><h2>{{tr $.Language "Відеопрофілі камери"}}</h2><form id="onvif-profiles"><label>{{tr $.Language "Адреса пристрою"}}<input name="address" placeholder="http://camera/onvif/device_service" required></label><label>{{tr $.Language "Користувач"}}<input name="username" autocomplete="off"></label><label>{{tr $.Language "Пароль"}}<input type="password" name="password" autocomplete="off"></label><button class="primary">{{tr $.Language "Отримати профілі"}}</button></form><pre id="profiles-result" role="status"></pre></section></div>
+{{template "foot" .}}{{end}}
+
+{{define "settings"}}{{template "head" .}}
+<p class="eyebrow">{{tr $.Language "ІНСТАЛЯЦІЯ"}}</p><h1>{{tr $.Language "Загальні налаштування"}}</h1>
+<nav class="tabs" aria-label="{{tr .Language "Розділи налаштувань"}}">
+<a href="/settings?tab=general" {{if or (eq .SettingsTab "general") (not .SettingsTab)}}aria-current="page"{{end}}>{{tr .Language "Загальні"}}</a>
+<a href="/settings?tab=recording" {{if eq .SettingsTab "recording"}}aria-current="page"{{end}}>{{tr .Language "Запис"}}</a>
+<a href="/settings?tab=camera-groups" {{if eq .SettingsTab "camera-groups"}}aria-current="page"{{end}}>{{tr .Language "Групи камер"}}</a>
+<a href="/settings?tab=telegram" {{if eq .SettingsTab "telegram"}}aria-current="page"{{end}}>Telegram</a>
+<a href="/settings?tab=oidc" {{if eq .SettingsTab "oidc"}}aria-current="page"{{end}}>OIDC</a></nav>
+{{if eq .SettingsTab "recording"}}
+{{template "recording-settings" .}}
+{{else if eq .SettingsTab "camera-groups"}}
+{{template "camera-groups-settings" .}}
+{{else if eq .SettingsTab "telegram"}}
+<section><h2>Telegram</h2>
+{{if eq .TelegramResult "saved"}}<p class="notice success" role="status">{{tr $.Language "Налаштування Telegram збережено."}}</p>{{end}}{{if eq .TelegramResult "invalid"}}<p class="notice error" role="alert">{{tr $.Language "Перевір токен бота та Chat ID. Для увімкнення потрібні обидва поля."}}</p>{{end}}
+<form action="/ui/settings/telegram" method="post"><input type="hidden" name="csrf" value="{{.CSRF}}"><label class="check"><input type="checkbox" name="enabled" {{if .Telegram.Enabled}}checked{{end}}>{{tr $.Language "Увімкнути сповіщення Telegram"}}</label>
+<p class="muted">{{if .Telegram.TokenSet}}{{tr $.Language "Токен збережено."}}{{else}}{{tr $.Language "Токен ще не задано."}}{{end}} {{tr $.Language "Зміни застосовуються без перезапуску сервісів."}}</p>
+<label>{{tr $.Language "Токен бота"}}<input name="token" type="password" autocomplete="new-password" maxlength="256" placeholder="{{tr $.Language "Залиш порожнім, щоб зберегти поточний токен"}}"></label>
+<label>Chat ID<input name="chat_id" value="{{.Telegram.ChatID}}" maxlength="128" placeholder="{{tr $.Language "-1001234567890 або @channel"}}"></label>
+<label class="check"><input type="checkbox" name="clear_token">{{tr $.Language "Видалити збережений токен"}}</label>
+<p class="muted">{{tr $.Language "Створи бота через @BotFather, відкрий чат із ботом або додай його до групи. Вкажи ID чату або @ім’я каналу. Сповіщення про рух також потрібно увімкнути в налаштуваннях потрібних камер."}}</p><button class="primary">{{tr $.Language "Зберегти Telegram"}}</button></form></section>
+{{else if eq .SettingsTab "oidc"}}
+<section><h2>{{tr .Language "Вхід через OIDC"}}</h2>
+{{if eq .OIDCResult "saved"}}<p class="notice success" role="status">{{tr .Language "Налаштування OIDC збережено."}}</p>{{end}}
+{{if .OIDCError}}<p class="notice error" role="alert">{{.OIDCError}}</p>{{end}}
+<p class="muted">{{tr .Language "Локальний вхід із паролем залишається доступним. Зміни OIDC застосовуються без перезапуску."}}</p>
+<form action="/ui/settings/oidc" method="post"><input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="revision" value="{{.OIDC.Revision}}">
+<label class="check"><input type="checkbox" name="enabled" {{if .OIDC.Enabled}}checked{{end}}>{{tr .Language "Увімкнути OIDC"}}</label>
+<label>{{tr .Language "Адреса провайдера (Issuer URL)"}}<input type="url" name="issuer" value="{{.OIDC.Issuer}}" maxlength="2048" placeholder="https://auth.example.com/realms/home"></label>
+<p class="muted">{{tr .Language "Використовуй HTTPS. HTTP дозволений лише для localhost під час розробки."}}</p>
+<label>Client ID<input name="client_id" value="{{.OIDC.ClientID}}" maxlength="512" autocomplete="off"></label>
+<label>{{tr .Language "Секрет клієнта"}}<input name="client_secret" type="password" maxlength="4096" autocomplete="new-password" placeholder="{{tr .Language "Залиш порожнім, щоб зберегти поточний секрет"}}"></label>
+<p class="muted">{{if .OIDC.SecretSet}}{{tr .Language "Секрет збережено."}}{{else}}{{tr .Language "Секрет не задано. Для публічного клієнта з PKCE він необов’язковий."}}{{end}}</p>
+<label class="check"><input type="checkbox" name="clear_secret">{{tr .Language "Видалити збережений секрет"}}</label>
+<label>{{tr .Language "Адреса повернення (Redirect URI)"}}<input readonly value="{{.OIDCCallback}}"></label>
+<p class="muted">{{tr .Language "Зареєструй цю точну адресу в налаштуваннях клієнта у провайдера. Використовується Authorization Code із PKCE."}}</p>
+<h3>{{tr .Language "Відповідність груп ролям"}}</h3>
+<label>{{tr .Language "Поле з групами у токені"}}<input name="role_claim" value="{{.OIDC.RoleClaim}}" maxlength="200" placeholder="groups"></label>
+<label>{{tr .Language "Групи адміністраторів"}}<input name="admin_groups" value="{{.OIDCAdminGroups}}" placeholder="admins, security-admins"></label>
+<label>{{tr .Language "Групи менеджерів"}}<input name="manager_groups" value="{{.OIDCManagerGroups}}" placeholder="operators"></label>
+<p class="muted">{{tr .Language "Вкажи назву поля верхнього рівня та групи через кому. Нові користувачі без відповідності отримують роль спостерігача. Ролі наявних користувачів керуються у Вартовому."}}</p>
+<p class="muted">{{tr .Language "Перед увімкненням перевіряється конфігурація провайдера. Правильність Client ID і секрету підтверджується під час входу."}}</p>
+<button class="primary">{{tr .Language "Зберегти OIDC"}}</button></form></section>
+{{else}}
+<section><h2>{{tr $.Language "Доступ до системи"}}</h2><dl class="settings-list"><dt>{{tr $.Language "Вебадреса"}}</dt><dd>{{.PublicURL}}</dd><dt>{{tr $.Language "Вхід із паролем"}}</dt><dd>{{tr $.Language "Увімкнений"}}</dd><dt>{{tr $.Language "Вхід через OIDC"}}</dt><dd>{{if .OIDCEnabled}}{{tr $.Language "Увімкнений"}}{{else}}{{tr $.Language "Не підключений"}}{{end}}</dd></dl><p class="muted">{{tr $.Language "Параметри інсталяції задаються конфігурацією сервера."}}</p></section>{{end}}
+{{template "foot" .}}{{end}}

@@ -1,0 +1,7 @@
+{{define "pagination"}}{{with .Pagination}}<div class="pagination-bar">
+<p class="muted pagination-summary">{{tr $.Language "Показано"}} {{.From}}–{{.To}} {{tr $.Language "із"}} {{.Total}}</p>
+<nav class="pagination-links" aria-label="{{tr $.Language "Сторінки"}}">{{if .Prev}}<a class="button" href="{{.Prev}}" rel="prev">{{tr $.Language "← Назад"}}</a>{{end}}
+{{range .Links}}{{if .Gap}}<span aria-hidden="true">…</span>{{else if .Current}}<span class="button current-page" aria-current="page">{{.Number}}</span>{{else}}<a class="button" href="{{.URL}}">{{.Number}}</a>{{end}}{{end}}
+{{if .Next}}<a class="button" href="{{.Next}}" rel="next">{{tr $.Language "Далі →"}}</a>{{end}}</nav>
+<form action="{{.Path}}" method="get" class="page-size-form">{{range .Filters}}<input type="hidden" name="{{.Name}}" value="{{.Value}}">{{end}}<label>{{tr $.Language "На сторінці"}}<select name="page_size" onchange="this.form.requestSubmit()"><option value="10" {{if eq .Size 10}}selected{{end}}>10</option><option value="25" {{if eq .Size 25}}selected{{end}}>25</option><option value="50" {{if eq .Size 50}}selected{{end}}>50</option><option value="100" {{if eq .Size 100}}selected{{end}}>100</option></select></label><noscript><button>{{tr $.Language "Застосувати"}}</button></noscript></form>
+</div>{{end}}{{end}}

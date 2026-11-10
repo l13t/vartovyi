@@ -1,0 +1,17 @@
+{{define "camera-groups-settings"}}
+{{template "recording-messages" .}}
+<div class="heading"><h2>{{tr .Language "Групи камер"}}</h2><a class="button" href="/settings?tab=recording">{{tr .Language "Квоти архіву"}}</a></div>
+<p class="muted">{{tr .Language "Група default автоматично містить усі камери, включно з камерами в інших групах. Її не можна перейменувати або видалити."}}</p>
+<div class="camera-groups-grid">
+<section class="camera-group-card default-group" data-default-group><h3>default <span class="muted">· {{tr .Language "Усі камери"}}</span></h3><p class="muted">{{tr .Language "Камер:"}} {{len .RecordingCameras}}</p>
+<div class="group-members">{{range .RecordingCameras}}<a class="button" href="/cameras/{{.ID}}">{{.Name}}</a>{{else}}<p class="muted">{{tr .Language "Поки що немає камер"}}</p>{{end}}</div>
+<a class="button" href="/">{{tr .Language "Показати камери"}}</a><a class="button" href="/settings?tab=recording&amp;scope=global">{{tr .Language "Квоти архіву"}}</a></section>
+{{range .RecordingGroups}}<section class="camera-group-card"><h3>{{.Name}}</h3><p class="muted">{{tr $.Language "Камер:"}} {{.CameraCount}}</p>
+<div class="group-members">{{range .Cameras}}<a class="button" href="/cameras/{{.ID}}">{{.Name}}</a>{{else}}<p class="muted">{{tr $.Language "У цій групі немає камер."}}</p>{{end}}</div>
+<form action="/ui/camera-groups" method="post"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Recording.Revision}}"><input type="hidden" name="action" value="rename"><input type="hidden" name="id" value="{{.ID}}"><label>{{tr $.Language "Назва групи"}}<input name="name" value="{{.Name}}" maxlength="100" required></label><button>{{tr $.Language "Зберегти"}}</button></form>
+<a class="button" href="/?group={{.ID}}">{{tr $.Language "Показати камери"}}</a><a class="button" href="/settings?tab=recording&amp;scope=group:{{.ID}}">{{tr $.Language "Ліміти групи"}}</a>
+<form action="/ui/camera-groups" method="post"><input type="hidden" name="csrf" value="{{$.CSRF}}"><input type="hidden" name="revision" value="{{$.Recording.Revision}}"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{.ID}}"><button class="danger" {{if .CameraCount}}disabled{{end}}>{{tr $.Language "Видалити порожню групу"}}</button></form></section>{{end}}
+</div>
+<section class="group-create"><h3>{{tr .Language "Нова група камер"}}</h3><form action="/ui/camera-groups" method="post"><input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="revision" value="{{.Recording.Revision}}"><input type="hidden" name="action" value="create"><label>{{tr .Language "Назва групи"}}<input name="name" maxlength="100" required></label><button class="primary">{{tr .Language "Створити групу"}}</button></form></section>
+<p class="muted">{{tr .Language "Додаткову групу призначай у налаштуваннях камери. У default камера залишається завжди."}}</p>
+{{end}}

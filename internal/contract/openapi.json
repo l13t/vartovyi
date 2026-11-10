@@ -1,0 +1,2152 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Vartovyi API",
+    "version": "0.1.0",
+    "description": "Client-independent JSON API. Web uses server sessions with CSRF. Native mobile authorization code + PKCE / Bearer support is a future phase, not an implemented endpoint. Timeline windows <=24h, export windows <=1h. Camera URL fields are write-only."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "security": [
+    {
+      "session": []
+    }
+  ],
+  "paths": {
+    "/api/v1/me": {
+      "get": {
+        "summary": "Get current principal",
+        "operationId": "get_get_current_principal",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    "csrf_token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/cameras": {
+      "get": {
+        "summary": "List cameras",
+        "operationId": "get_list_cameras",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Camera"
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create camera",
+        "operationId": "post_create_camera",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Camera"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Camera"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cameras/{id}": {
+      "get": {
+        "summary": "Get camera",
+        "operationId": "get_get_camera",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Camera"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update camera",
+        "operationId": "put_update_camera",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Camera"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          },
+          "409": {
+            "description": "Revision or idempotency conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Camera"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete camera configuration",
+        "operationId": "delete_delete_camera_configuration",
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/status": {
+      "get": {
+        "summary": "List camera status",
+        "operationId": "get_list_camera_status",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Status"
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/events": {
+      "get": {
+        "summary": "List events",
+        "operationId": "get_list_events",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Event"
+                      }
+                    },
+                    "next_cursor": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            }
+          },
+          {
+            "name": "camera_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/cameras/{id}/timeline": {
+      "get": {
+        "summary": "Get recording timeline",
+        "operationId": "get_get_recording_timeline",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Segment"
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/exports": {
+      "post": {
+        "summary": "Create export",
+        "operationId": "post_create_export",
+        "responses": {
+          "202": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Export"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          },
+          "409": {
+            "description": "Revision or idempotency conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/exports/{id}": {
+      "get": {
+        "summary": "Get export status",
+        "operationId": "get_get_export_status",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Export"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "summary": "List users",
+        "operationId": "get_list_users",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          },
+          "400": {
+            "description": "Invalid user search query"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "description": "Plain text searches name, username and role. team: admin filters roles; user: admin* filters username prefix. Multiple terms use AND; double quotes group phrases."
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create or update user",
+        "operationId": "post_create_or_update_user",
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserWrite"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/onvif/discover": {
+      "post": {
+        "summary": "Discover ONVIF devices",
+        "operationId": "post_discover_onvif_devices",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "address": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/onvif/profiles": {
+      "post": {
+        "summary": "Read ONVIF profiles",
+        "operationId": "post_read_onvif_profiles",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ONVIFProfile"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ONVIFRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/exports/{id}/download": {
+      "get": {
+        "summary": "Read download",
+        "operationId": "get__api_v1_exports_id_download",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "video/mp4": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/events/{id}/snapshot": {
+      "get": {
+        "summary": "Read snapshot",
+        "operationId": "get__api_v1_events_id_snapshot",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/media/{camera_id}/playback/clip.mp4": {
+      "get": {
+        "summary": "Read clip.mp4",
+        "operationId": "get__media_camera_id_playback_clip_mp4",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "video/mp4": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "camera_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ]
+      }
+    },
+    "/media/{camera_id}/live/{resource}": {
+      "get": {
+        "summary": "Read {resource}",
+        "operationId": "get__media_camera_id_live_resource",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/vnd.apple.mpegurl": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "camera_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resource",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/stream": {
+      "get": {
+        "summary": "Stream status snapshots",
+        "operationId": "get_stream_status_snapshots",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "description": "SSE event=status; data is {version:1,items:Status[]}. IDs are snapshot IDs, not a durable event cursor. Reconnect sends a fresh snapshot."
+      }
+    },
+    "/api/v1/profile": {
+      "get": {
+        "summary": "Read own profile",
+        "operationId": "get_own_profile",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    "can_change_password": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update own profile or local password",
+        "operationId": "update_own_profile",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileChanges"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    },
+                    "csrf_token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid name, incorrect current password, weak password or externally managed password"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/api/v1/settings/telegram": {
+      "get": {
+        "summary": "Get Telegram settings (admin)",
+        "operationId": "getTelegramSettings",
+        "responses": {
+          "200": {
+            "description": "Telegram configuration; token is never returned. Administrator only.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelegramSettings"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Administrator required"
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace Telegram settings (admin)",
+        "operationId": "putTelegramSettings",
+        "description": "CSRF required. Applied by notifier on its next event, without restart. Explicitly disabled database configuration overrides server secrets.",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelegramChanges"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Telegram configuration; token is never returned. Administrator only.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelegramSettings"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or incomplete settings"
+          },
+          "403": {
+            "description": "Administrator or CSRF required"
+          }
+        }
+      }
+    },
+    "/api/v1/settings/oidc": {
+      "get": {
+        "summary": "Get OIDC settings (admin)",
+        "operationId": "getOIDCSettings",
+        "responses": {
+          "200": {
+            "description": "Administrator-only OIDC configuration, without client secret.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OIDCSettings"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Administrator required"
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace OIDC settings (admin)",
+        "operationId": "putOIDCSettings",
+        "description": "Validates discovery before enabling and applies without restart. Local login remains available. Database settings override server configuration.",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OIDCChanges"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Administrator-only OIDC configuration, without client secret.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OIDCSettings"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid settings"
+          },
+          "403": {
+            "description": "Administrator or CSRF required"
+          },
+          "409": {
+            "description": "Revision conflict; reload settings"
+          },
+          "502": {
+            "description": "Discovery failed; settings remain unchanged"
+          }
+        }
+      }
+    },
+    "/api/v1/users/bulk-delete": {
+      "post": {
+        "operationId": "bulkDeleteUsers",
+        "summary": "Delete selected users atomically (admin)",
+        "description": "Deletes 1–1000 distinct accounts and revokes their sessions. Cannot delete the caller or remove every administrator. Cameras, recordings and exports are preserved. No account is deleted if any selection is invalid.",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1000,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Accounts deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "deleted": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid selection or protected account"
+          },
+          "403": {
+            "description": "Administrator or CSRF required"
+          },
+          "404": {
+            "description": "At least one account was not found; nothing deleted"
+          }
+        }
+      }
+    },
+    "/api/v1/settings/recording": {
+      "get": {
+        "summary": "Get recording policy (admin)",
+        "operationId": "getRecordingSettings",
+        "responses": {
+          "200": {
+            "description": "Recording policy and camera groups",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecordingSettings"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace recording policy and groups (admin)",
+        "operationId": "putRecordingSettings",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordingSettings"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recording policy and camera groups",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecordingSettings"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid policy"
+          },
+          "409": {
+            "description": "Stale revision or a removed group still has cameras"
+          }
+        }
+      }
+    },
+    "/api/v1/camera-groups": {
+      "get": {
+        "summary": "List camera group IDs and names",
+        "operationId": "listCameraGroups",
+        "responses": {
+          "200": {
+            "description": "items contains group id and name; authenticated viewers allowed"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create or rename a group (admin)",
+        "operationId": "saveCameraGroup",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Empty to create, existing ID to rename"
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "revision": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "name",
+                  "revision"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recording policy and camera groups",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecordingSettings"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid group or stale policy revision"
+          }
+        }
+      }
+    },
+    "/api/v1/camera-groups/{id}": {
+      "delete": {
+        "summary": "Delete an empty group (admin)",
+        "operationId": "deleteCameraGroup",
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "revision"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Recording policy and camera groups",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecordingSettings"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Group still contains cameras or stale revision"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "session": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "vartovyi_session"
+      }
+    },
+    "schemas": {
+      "Point": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "y": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ]
+      },
+      "Zone": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "exclude": {
+            "type": "boolean"
+          },
+          "points": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 64,
+            "items": {
+              "$ref": "#/components/schemas/Point"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "points"
+        ]
+      },
+      "Camera": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "shard_id": {
+            "type": "string"
+          },
+          "source": {
+            "enum": [
+              "rtsp",
+              "h264_tcp"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "writeOnly": true,
+            "description": "Credentials allowed; encrypted at rest and omitted on read. Empty on update preserves existing URL."
+          },
+          "substream": {
+            "type": "string",
+            "writeOnly": true,
+            "description": "RTSP URL; __unchanged__ preserves current substream on update; empty removes it."
+          },
+          "fps": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 60,
+            "description": "Raw H.264 input framing rate, or FPS ceiling when RTSP transcoding is enabled. Direct RTSP proxying keeps the original frame rate."
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "mode": {
+            "enum": [
+              "continuous",
+              "motion"
+            ]
+          },
+          "retention_days": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3650
+          },
+          "quota_bytes": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "pre_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 120
+          },
+          "post_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 120
+          },
+          "threshold": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "zones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zone"
+            }
+          },
+          "notify": {
+            "type": "boolean"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int64",
+            "description": "0 for create, current revision required for update."
+          },
+          "group_id": {
+            "type": "string",
+            "description": "Camera group ID, or empty for ungrouped."
+          },
+          "max_segments": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000000
+          },
+          "transcode": {
+            "type": "boolean",
+            "default": false,
+            "description": "For RTSP: decode and encode H.264 on the recorder, e.g. MJPEG ESP32 cameras. False keeps direct RTSP proxying."
+          },
+          "rtsp_transport": {
+            "type": "string",
+            "enum": [
+              "",
+              "tcp",
+              "udp"
+            ],
+            "default": "tcp",
+            "description": "Transport from the camera; blank defaults to TCP. Internal publisher transport stays TCP."
+          },
+          "motion_enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "False stops detection and new motion events without stopping recording. Missing/null preserves the existing value on update, defaults to true for legacy/new cameras. Motion-only recording retains video continuously while detection is disabled."
+          },
+          "motion_full_frame": {
+            "type": "boolean",
+            "default": false,
+            "description": "True analyzes the whole frame, ignoring all saved include/exclude zones without deleting them. False uses saved zones; an empty zone list still means the whole frame."
+          }
+        },
+        "required": [
+          "name",
+          "shard_id",
+          "source",
+          "fps",
+          "enabled",
+          "mode",
+          "retention_days",
+          "pre_seconds",
+          "post_seconds",
+          "threshold",
+          "revision"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "admin",
+              "manager",
+              "viewer"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name; empty names fall back to username in the web UI."
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "uk",
+              "en"
+            ],
+            "description": "Personal interface language."
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "role"
+        ]
+      },
+      "UserWrite": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "admin",
+              "manager",
+              "viewer"
+            ]
+          },
+          "password": {
+            "type": "string",
+            "writeOnly": true,
+            "minLength": 12
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "username",
+          "role"
+        ]
+      },
+      "Segment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "camera_id": {
+            "type": "string"
+          },
+          "shard_id": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "bytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "keep": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "const": 1
+          },
+          "type": {
+            "const": "motion"
+          },
+          "camera_id": {
+            "type": "string"
+          },
+          "shard_id": {
+            "type": "string"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "score": {
+            "type": "number"
+          },
+          "notify": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Status": {
+        "type": "object",
+        "properties": {
+          "camera_id": {
+            "type": "string"
+          },
+          "shard_id": {
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "disabled",
+              "offline",
+              "recording",
+              "disk_full",
+              "detector_degraded"
+            ]
+          },
+          "last_segment": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "detector_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ExportRequest": {
+        "type": "object",
+        "properties": {
+          "camera_id": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "camera_id",
+          "start",
+          "end"
+        ]
+      },
+      "Export": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "camera_id": {
+            "type": "string"
+          },
+          "shard_id": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "running",
+              "ready",
+              "failed",
+              "expired"
+            ]
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "ONVIFRequest": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "address"
+        ]
+      },
+      "ONVIFProfile": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "uri": {
+            "type": "string"
+          }
+        }
+      },
+      "ProfileChanges": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "current_password": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "new_password": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 1024,
+            "writeOnly": true
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "uk",
+              "en"
+            ]
+          }
+        },
+        "description": "Only the current user is updated. New passwords require the existing local password. Role, username and account ID cannot be changed. Password change revokes all old sessions and issues a replacement cookie/CSRF token for the caller."
+      },
+      "TelegramSettings": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "chat_id": {
+            "type": "string"
+          },
+          "token_set": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled",
+          "chat_id",
+          "token_set"
+        ]
+      },
+      "TelegramChanges": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "chat_id": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "token": {
+            "type": "string",
+            "maxLength": 256,
+            "writeOnly": true,
+            "description": "Blank or omitted preserves saved token. Encrypted at rest."
+          },
+          "clear_token": {
+            "type": "boolean",
+            "description": "Explicitly remove the saved token; takes precedence over token."
+          }
+        },
+        "required": [
+          "enabled",
+          "chat_id"
+        ]
+      },
+      "OIDCSettings": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "issuer": {
+            "type": "string",
+            "maxLength": 2048,
+            "description": "HTTPS issuer URL. HTTP is allowed only for localhost development."
+          },
+          "client_id": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "role_claim": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Top-level ID token claim containing a string or array of group names."
+          },
+          "role_map": {
+            "type": "object",
+            "maxProperties": 100,
+            "additionalProperties": {
+              "type": "string",
+              "enum": [
+                "viewer",
+                "manager",
+                "admin"
+              ]
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Optimistic concurrency version. Use the revision returned by GET."
+          },
+          "secret_set": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled",
+          "issuer",
+          "client_id",
+          "role_claim",
+          "role_map",
+          "revision",
+          "secret_set"
+        ]
+      },
+      "OIDCChanges": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "issuer": {
+            "type": "string",
+            "maxLength": 2048,
+            "description": "HTTPS issuer URL. HTTP is allowed only for localhost development."
+          },
+          "client_id": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "role_claim": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Top-level ID token claim containing a string or array of group names."
+          },
+          "role_map": {
+            "type": "object",
+            "maxProperties": 100,
+            "additionalProperties": {
+              "type": "string",
+              "enum": [
+                "viewer",
+                "manager",
+                "admin"
+              ]
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Optimistic concurrency version. Use the revision returned by GET."
+          },
+          "client_secret": {
+            "type": "string",
+            "maxLength": 4096,
+            "writeOnly": true,
+            "description": "Omitted or blank preserves the stored secret."
+          },
+          "clear_secret": {
+            "type": "boolean",
+            "description": "Explicitly remove the secret, overriding client_secret."
+          }
+        },
+        "required": [
+          "enabled",
+          "issuer",
+          "client_id",
+          "revision"
+        ]
+      },
+      "RecordingLimits": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "max_age_days": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3650
+          },
+          "max_segments": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000000
+          },
+          "max_bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1125899906842624
+          }
+        },
+        "description": "Zero disables that limit at this scope. All scopes apply cumulatively; group and global budgets are shared across shards."
+      },
+      "CameraGroup": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "limits": {
+            "$ref": "#/components/schemas/RecordingLimits"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "limits"
+        ]
+      },
+      "RecordingSettings": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "global": {
+            "$ref": "#/components/schemas/RecordingLimits"
+          },
+          "groups": {
+            "type": "array",
+            "maxItems": 128,
+            "items": {
+              "$ref": "#/components/schemas/CameraGroup"
+            }
+          }
+        },
+        "required": [
+          "revision",
+          "global",
+          "groups"
+        ]
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Authentication required; JSON without redirects",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Role or CSRF denied",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Unavailable": {
+        "description": "Dependency unavailable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    }
+  }
+}

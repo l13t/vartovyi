@@ -1,0 +1,19 @@
+{{define "head"}}
+<!doctype html><html lang="{{if eq .Language "en"}}en{{else}}uk{{end}}"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="csrf-token" content="{{.CSRF}}"><title>{{tr $.Language "Вартовий"}}</title>
+<link rel="stylesheet" href="/static/app.css">
+<script defer src="/static/vendor/htmx.min.js"></script><script defer src="/static/vendor/hls.min.js"></script>
+<script type="module" src="/static/app.js"></script>
+</head><body><header>
+<a class="brand" href="/">{{tr $.Language "◉ Вартовий"}}</a>
+{{if .User}}<nav aria-label="{{tr $.Language "Головна навігація"}}">
+<a href="/" {{if eq .Nav "cameras"}}aria-current="page"{{end}}>{{tr $.Language "Камери"}}</a>
+<a href="/events" {{if eq .Nav "events"}}aria-current="page"{{end}}>{{tr $.Language "Події"}}</a>
+{{if .IsAdmin}}<a href="/users" {{if eq .Nav "users"}}aria-current="page"{{end}}>{{tr $.Language "Користувачі"}}</a>
+<a href="/settings" {{if eq .Nav "settings"}}aria-current="page"{{end}}>{{tr $.Language "Загальні налаштування"}}</a>{{end}}
+</nav><div class="account-nav"><a class="account-link" href="/profile" {{if eq .Nav "profile"}}aria-current="page"{{end}} title="{{tr $.Language "Мій профіль"}}">◎ {{.User.DisplayName}}</a>
+<form action="/ui/language" method="post"><input type="hidden" name="csrf" value="{{.CSRF}}"><label>{{tr .Language "Мова"}}<select name="language" onchange="this.form.requestSubmit()"><option value="uk" {{if ne .Language "en"}}selected{{end}}>Українська</option><option value="en" {{if eq .Language "en"}}selected{{end}}>English</option></select></label><noscript><button>{{tr .Language "Зберегти мову"}}</button></noscript></form><form action="/logout" method="post"><input type="hidden" name="csrf" value="{{.CSRF}}"><button>{{tr $.Language "Вийти"}}</button></form></div>{{else}}<nav aria-label="Language"><a href="/login?lang=uk" lang="uk">Українська</a><a href="/login?lang=en" lang="en">English</a></nav>{{end}}
+</header><main>
+{{end}}
+{{define "foot"}}</main><footer>{{tr $.Language "Vartovyi · Відео під твоїм контролем"}} · <span>{{tr $.Language "Версія"}} {{version}}</span> · <span>{{tr $.Language "Ліцензія"}}: {{tr $.Language (license)}}</span></footer></body></html>{{end}}

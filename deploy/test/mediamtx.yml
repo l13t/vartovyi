@@ -1,0 +1,14 @@
+logLevel: warn
+api: yes
+apiAddress: :9997
+rtspTransports: [tcp]
+rtmp: no
+srt: no
+moq: no
+webrtc: no
+hls: yes
+playback: yes
+authMethod: http
+authHTTPAddress: http://recorder:8090/internal/media-auth
+authHTTPExclude: []
+paths: {}

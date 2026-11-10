@@ -1,0 +1,7 @@
+.git
+data
+tmp
+bin
+*.local.*
+.env
+node_modules

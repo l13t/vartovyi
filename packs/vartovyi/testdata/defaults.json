@@ -1,0 +1,86 @@
+{
+  "job_name": "vartovyi",
+  "namespace": "default",
+  "region": "global",
+  "datacenters": [
+    "dc1"
+  ],
+  "otel_endpoint": "",
+  "otel_sample_ratio": "0.1",
+  "image": "vartovyi:dev",
+  "media_image": "vartovyi-media:dev",
+  "postgres_image": "postgres:17.11-alpine",
+  "nats_image": "nats:2.15.2-alpine",
+  "traefik_image": "traefik:v3.7.17",
+  "public_url": "https://vartovyi.example.com",
+  "cookie_secure": true,
+  "camera_cidrs": [
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "192.168.0.0/16"
+  ],
+  "discovery_interface": "",
+  "api_network_mode": "bridge",
+  "api_count": 1,
+  "postgres_enabled": true,
+  "nats_enabled": true,
+  "node_pool": "default",
+  "ingress_mode": "bundled",
+  "http_port": 80,
+  "https_port": 443,
+  "nomad_address": "http://127.0.0.1:4646",
+  "oidc_issuer": "",
+  "oidc_client_id": "",
+  "oidc_role_claim": "roles",
+  "oidc_role_map": {},
+  "postgres_volume": {
+    "type": "host",
+    "source": "vartovyi-postgres"
+  },
+  "nats_volume": {
+    "type": "host",
+    "source": "vartovyi-nats"
+  },
+  "shards": [
+    {
+      "id": "main",
+      "volume_type": "host",
+      "volume_source": "vartovyi-archive",
+      "quota_bytes": 0
+    }
+  ],
+  "resources": {
+    "api": {
+      "cpu": 1000,
+      "memory": 256
+    },
+    "recorder": {
+      "cpu": 1000,
+      "memory": 512
+    },
+    "detector": {
+      "cpu": 2000,
+      "memory": 512
+    },
+    "media": {
+      "cpu": 1000,
+      "memory": 512
+    },
+    "notifier": {
+      "cpu": 250,
+      "memory": 128
+    },
+    "postgres": {
+      "cpu": 1000,
+      "memory": 512
+    },
+    "nats": {
+      "cpu": 500,
+      "memory": 256
+    },
+    "ingress": {
+      "cpu": 250,
+      "memory": 128
+    }
+  }
+}

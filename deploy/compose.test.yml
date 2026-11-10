@@ -1,0 +1,101 @@
+name: vartovyi-integration
+services:
+  postgres:
+    image: postgres:17.11-alpine
+    environment:
+      POSTGRES_USER: vartovyi
+      POSTGRES_PASSWORD: test-password
+      POSTGRES_DB: vartovyi
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U vartovyi -d vartovyi"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  nats:
+    image: nats:2.15.2-alpine
+    user: "0:0"
+    command: [-js, -sd, /data]
+    tmpfs: [/data]
+  init-archive:
+    image: busybox:1.38.0
+    command: [sh, -c, "chown 10001:10001 /archive && chmod 700 /archive"]
+    volumes: [archive:/archive]
+  source:
+    image: bluenviron/mediamtx:1.21.3
+    volumes: [./test/source.yml:/mediamtx.yml:ro]
+  media:
+    build:
+      context: ..
+      target: media
+    entrypoint: [/usr/local/bin/mediamtx, /config/mediamtx.yml]
+    environment:
+      VARTOVYI_CONFIG: /config/recorder.json
+      TZ: UTC
+      MTX_HLSCDNSECRET: test-service-token-only
+    volumes: [./test:/config:ro, archive:/archive]
+    depends_on:
+      init-archive:
+        condition: service_completed_successfully
+  migrate:
+    build:
+      context: ..
+      target: runtime
+    entrypoint: [/usr/local/bin/migrate]
+    environment:
+      VARTOVYI_CONFIG: /config/api.json
+    volumes: [./test:/config:ro]
+    depends_on:
+      postgres:
+        condition: service_healthy
+  api:
+    build:
+      context: ..
+      target: runtime
+    environment:
+      VARTOVYI_CONFIG: /config/api.json
+    volumes: [./test:/config:ro]
+    ports: ["127.0.0.1:${VARTOVYI_HTTP_PORT:-8080}:8080"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+  recorder:
+    build:
+      context: ..
+      target: runtime
+    entrypoint: [/usr/local/bin/recorder]
+    environment:
+      VARTOVYI_CONFIG: /config/recorder.json
+      TZ: UTC
+    volumes: [./test:/config:ro, archive:/archive]
+    depends_on:
+      init-archive:
+        condition: service_completed_successfully
+      migrate:
+        condition: service_completed_successfully
+  detector:
+    build:
+      context: ..
+      target: runtime
+    entrypoint: [/usr/local/bin/detector]
+    environment:
+      VARTOVYI_CONFIG: /config/detector.json
+    volumes: [./test:/config:ro]
+  notifier:
+    build:
+      context: ..
+      target: runtime
+    entrypoint: [/usr/local/bin/notifier]
+    environment:
+      VARTOVYI_CONFIG: /config/notifier.json
+    volumes: [./test:/config:ro]
+  tests:
+    build:
+      context: ..
+      target: runtime
+    entrypoint: [/usr/local/bin/integration.test, -test.v, -test.timeout=180s]
+    environment:
+      VARTOVYI_INTEGRATION: "1"
+      VARTOVYI_TEST_URL: http://api:8080
+    depends_on: [api, media, recorder, detector, source, nats]
+volumes:
+  archive:

@@ -1,0 +1,26 @@
+{
+  "service_token": "test-service-token-only",
+  "encryption_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+  "database_url": "postgres://vartovyi:test-password@postgres:5432/vartovyi?sslmode=disable",
+  "nats_url": "nats://nats:4222",
+  "public_url": "http://localhost:8080",
+  "cookie_secure": false,
+  "shard_id": "main",
+  "shard_urls": {
+    "main": "http://recorder:8090"
+  },
+  "recorder_url": "http://recorder:8090",
+  "media_url": "http://media:9997",
+  "rtsp_url": "rtsp://media:8554",
+  "hls_url": "http://media:8888",
+  "playback_url": "http://media:9996",
+  "archive": "/archive",
+  "camera_cidrs": [
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "192.168.0.0/16"
+  ],
+  "admin_user": "admin",
+  "admin_password": "admin",
+  "listen": ":8092"
+}

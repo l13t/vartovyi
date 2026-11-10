@@ -1,0 +1,8 @@
+{{define "events"}}{{template "head" .}}
+<p class="eyebrow">{{tr $.Language "ЖУРНАЛ СПОСТЕРЕЖЕНЬ"}}</p><h1>{{tr $.Language "Події"}}</h1>
+<form class="filter-bar" action="/events" method="get">{{if .Pagination}}<input type="hidden" name="page_size" value="{{.Pagination.Size}}">{{end}}<label>{{tr $.Language "Камера"}}<select name="camera_id"><option value="">{{tr $.Language "Усі камери"}}</option>{{range .Cameras}}<option value="{{.ID}}" {{if eq $.FilterCamera .ID}}selected{{end}}>{{.Name}}</option>{{end}}</select></label><button>{{tr $.Language "Показати"}}</button></form>
+<div class="events">{{range .Events}}<a class="event" href="/cameras/{{.CameraID}}?at={{.At.Format "2006-01-02T15:04:05Z07:00"}}">
+<img loading="lazy" src="/api/v1/events/{{.ID}}/snapshot" alt="{{tr $.Language "Знімок події"}}"><div><strong>{{.CameraName}}</strong><p>{{tr $.Language "Виявлено рух ·"}} {{.At.Format "02.01.2006 15:04:05 UTC"}}</p><span class="text-link">{{tr $.Language "Відкрити камеру →"}}</span></div></a>
+{{else}}<section class="empty"><h2>{{tr $.Language "Подій поки немає"}}</h2><p class="muted">{{tr $.Language "Тут з’являться події руху з твоїх камер."}}</p></section>{{end}}</div>
+{{template "pagination" .}}
+{{template "foot" .}}{{end}}

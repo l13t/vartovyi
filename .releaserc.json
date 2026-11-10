@@ -1,0 +1,16 @@
+{
+  "branches": ["master"],
+  "repositoryUrl": "https://github.com/l13t/vartovyi.git",
+  "tagFormat": "v${version}",
+  "plugins": [
+    ["@semantic-release/commit-analyzer", { "preset": "conventionalcommits" }],
+    ["@semantic-release/release-notes-generator", { "preset": "conventionalcommits" }],
+    "./scripts/release-images.cjs",
+    ["@semantic-release/github", {
+      "successComment": false,
+      "failComment": false,
+      "failTitle": false,
+      "releasedLabels": false
+    }]
+  ]
+}
