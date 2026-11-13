@@ -67,6 +67,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - run: npm audit --audit-level=moderate
   release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: [go, pack, integration, release-config]

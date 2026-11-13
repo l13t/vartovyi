@@ -69,3 +69,14 @@ test('configured preset renders initial release notes with the installed writer'
   assert.match(notes, /0\.1\.0/);
   assert.match(notes, /initial implementation/);
 });
+
+test('unused npm publisher is disabled and bundled vulnerable dependencies are absent', async () => {
+  const config = require('../.releaserc.json');
+  assert.ok(config.plugins.every(p => (Array.isArray(p) ? p[0] : p) !== '@semantic-release/npm'));
+  const publisher = await import('@semantic-release/npm');
+  assert.throws(() => publisher.verifyConditions(), /npm publishing is disabled/);
+  const lock = require('../package-lock.json');
+  for (const path of Object.keys(lock.packages)) {
+    assert.ok(!/(^|\/)node_modules\/(npm|minimatch|glob)$/.test(path), `unexpected bundled dependency: ${path}`);
+  }
+});

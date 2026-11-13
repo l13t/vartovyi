@@ -6,7 +6,11 @@
     "test": "node --test scripts/release-images.test.cjs"
   },
   "devDependencies": {
+    "@semantic-release/npm": "file:./scripts/disabled-npm-publisher",
     "conventional-changelog-conventionalcommits": "9.3.1",
     "semantic-release": "25.0.9"
+  },
+  "overrides": {
+    "@semantic-release/npm": "$@semantic-release/npm"
   }
 }

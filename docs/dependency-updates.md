@@ -47,3 +47,22 @@ Primary version sources include [Go downloads](https://go.dev/dl/),
 [PostgreSQL images](https://hub.docker.com/_/postgres), and
 [Nomad releases](https://github.com/hashicorp/nomad/releases).
 See `docs/validation.md` for checks actually executed after this update.
+
+## Dependabot security update — 2026-11-13
+
+The managed Dependabot security job could not replace vulnerable minimatch/glob
+inside npm's bundled dependency tree. Leaf overrides were tested and did not
+replace those bundled copies. Vartovyi does not use npm package publishing, so
+`@semantic-release/npm` is replaced using a root file dependency/override with
+`scripts/disabled-npm-publisher`. This local plugin explicitly fails verification
+if enabled; the configured GitHub and container publishers are unchanged.
+`.npmrc` sets `install-links=true` so `npm ci` installs the local package
+reproducibly rather than relying on directory links.
+
+The lockfile no longer contains bundled npm, minimatch or glob. A clean `npm ci`,
+all six release tests (including real changelog generation and the disabled
+publisher guard), and `npm audit` passed locally with zero reported
+vulnerabilities. CI now audits development/release dependencies at moderate
+severity and above. No advisories are suppressed. This replacement can be
+removed when upstream semantic-release makes the unused npm publisher optional,
+or its bundled dependency tree is fixed and re-audited.

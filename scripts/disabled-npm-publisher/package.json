@@ -1,0 +1,8 @@
+{
+  "name": "@vartovyi/disabled-npm-publisher",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./index.js",
+  "description": "Fail-closed replacement for the unused semantic-release npm publisher"
+}
